@@ -47,7 +47,7 @@ def main():
                 continue
             compositions.add(composition)
 
-    template = Path('template.pbs')
+    template = Path('src') / "template.pbs"
     with open(template, 'r') as file:
         template_lines = file.read()
 
@@ -75,21 +75,23 @@ def main():
         Path(f'{new_dir}/log_files').mkdir(exist_ok=True)
         Path(f'{new_dir}/trash').mkdir(exist_ok=True)
 
-        root = os.getcwd()
+        root = Path(os.getcwd())
         files_to_symlink = [
-            'analysis.py',
-            'input_file.py',
-            'pbs_file.py',
-            'submission.sh',
-            'template.in',
+            "src/config.py",
+            "src/input_file.py",
+            "src/pbs_file.py",
+            "src/submission.sh",
+            "src/template.in",
             "config.json"
         ]
 
         for file in files_to_symlink + CONFIG.potential.files + [CONFIG.executable]:
-            target_path = Path(f'{new_dir}/{file}')
+            split = file.split("src/")
+            file_absolute_name = split[-1]
+            target_path = Path(f'{new_dir}/{file_absolute_name}')
             if target_path.is_symlink():
                 target_path.unlink()
-            target_path.symlink_to(f'{root}/{file}')
+            target_path.symlink_to(root / file)
 
 if __name__ == '__main__':
     main()
