@@ -1,0 +1,55 @@
+# some default settings
+echo both
+units metal
+boundary p p p
+newton on
+atom_style atomic
+neighbor 1.0 bin
+neigh_modify every 1 delay 5 check yes
+thermo 10000
+
+# create lattice
+lattice bcc 2.86506 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region box block 0 8 0 8 0 8
+create_box $ntypes box
+create_atoms 1 box
+
+# force field
+pair_style $pair_style
+pair_coeff $pair_coeff
+
+# composition
+$composition_lines
+
+# insert defect of a given type
+# either defect = V for vacancy or defect = I for interstitial
+variable defect equal $defect
+if "${defect} == V" then "delete_atoms random count 1 yes all NULL 123456" elif "${defect} == I" "create_atoms 1 random 1 123456 NULL overlap 0.5 maxtry 50 units box"
+
+# zero pressure minimization
+min_style cg
+min_modify dmax 1.0e-2 line quadratic
+fix min all box/relax iso 0.0 vmax 0.01
+minimize 0.0 1.0e-4 10000 10000
+unfix min
+
+# initialize velocities
+velocity all create $temperature 123456 dist gaussian
+velocity all zero linear
+velocity all zero angular
+
+# equilibrate with NVT dynamics
+fix lgv_fix all langevin $temperature $temperature 1.0 123456 gjf vhalf
+fix nve_fix all nve
+fix recenter_fix all recenter INIT INIT INIT
+dump equilibration_dump all custom 10000 dump_files/equilibrate_${temperature}_${defect}.dump id type x y z
+run 10000
+undump equilibration_dump
+
+# do main run
+reset_timestep 0
+dump transport_dump all custom 50000 dump_files/transport_${temperature}_${defect}.dump id type x y z
+run 100000000
+unfix lgv_fix
+unfix nve_fix
+unfix recenter_fix
