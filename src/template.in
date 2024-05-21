@@ -10,7 +10,7 @@ thermo 10000
 
 # create lattice
 lattice bcc 2.86506 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
-region box block 0 8 0 8 0 8
+region box block 0 10 0 10 0 25
 create_box $ntypes box
 create_atoms 1 box
 
