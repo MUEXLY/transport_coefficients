@@ -43,4 +43,4 @@ Once the jobs are finished, you can run the following to compress the (likely la
 make compress
 ```
 
-This will compress all of the dump files in formats that are readable, without compression, by both OVITO and NumPy.
+This will compress all of the dump files in formats that are readable, without decompression, by both OVITO and NumPy.
