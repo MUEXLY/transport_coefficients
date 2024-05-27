@@ -18,9 +18,12 @@ def main():
         fig, axs = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True)
         for ax, defect in zip(axs, ("V", "I")):
             df = pl.read_database(
-                query=f"SELECT temperature, L_11, L_12, L_21, L_22 FROM transport WHERE x_2 = {cr_fraction:.1f} AND defect = '{defect}'",
-                connection=connection
+                query="SELECT temperature, L_11, L_12, L_21, L_22 from transport WHERE x_2 = :x_2 and DEFECT = :defect",
+                connection=connection,
+                execute_options={"parameters": {"x_2": cr_fraction, "defect": defect}}
             )
+
+            print(df)
         
             ax.grid()
             temperature = df["temperature"].to_list()
