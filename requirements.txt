@@ -1,2 +1,4 @@
 ovito
 matplotlib
+sqlalchemy~=2.0.30
+polars~=0.20.30

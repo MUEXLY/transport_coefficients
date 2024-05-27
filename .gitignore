@@ -162,3 +162,4 @@ cython_debug/
 trash/
 lmp
 [0-9]*_[0-9]*/
+*.db
